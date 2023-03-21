@@ -1,0 +1,13 @@
+name: Check
+
+on:
+  - pull_request
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check building
+        run: docker compose run --rm java ./gradlew gem --console rich --info
