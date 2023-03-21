@@ -1,12 +1,12 @@
 plugins {
     id "java"
-    id "java-library"
+    // id "java-library"
+    id "maven-publish"
     id "org.embulk.embulk-plugins" version "0.5.5"
 }
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 configurations {
@@ -18,6 +18,7 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 group = "org.embulk"
 version = "0.4.1"
+description = "Logging the message of processed bytes and throughput periodically."
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
@@ -53,7 +54,6 @@ dependencies {
 
     implementation "org.embulk:embulk-util-timestamp:0.2.1"
 
-    implementation "com.google.guava:guava:31.1-jre"
     implementation 'org.slf4j:slf4j-api:2.0.7'
     implementation 'org.slf4j:slf4j-simple:2.0.7'
 

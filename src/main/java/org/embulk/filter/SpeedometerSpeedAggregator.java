@@ -6,8 +6,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.embulk.filter.SpeedometerFilterPlugin.PluginTask;
-import org.embulk.spi.Exec;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 class SpeedometerSpeedAggregator {
     private static final Object INSTANCE_LOCK = new Object();
@@ -22,7 +23,6 @@ class SpeedometerSpeedAggregator {
     private final AtomicLong previousLogReportTimeMillisec = new AtomicLong(INITAL_START_TIME);
     private final String logFormat;
 
-    // TODO: We can use google's library.
     private final List<SpeedometerSpeedController> controllerList = new ArrayList<>();
 
     public static SpeedometerSpeedAggregator getInstance(PluginTask task) {
@@ -90,7 +90,7 @@ class SpeedometerSpeedAggregator {
     }
 
     Logger getLogger() {
-        return Exec.getLogger(SpeedometerFilterPlugin.class);
+        return LoggerFactory.getLogger(SpeedometerFilterPlugin.class);
     }
 
     long getGlobalStartTime() {
