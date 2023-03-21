@@ -17,7 +17,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 group = "org.embulk"
-version = "0.4.2"
+version = "0.4.3"
 description = "Logging the message of processed bytes and throughput periodically."
 
 tasks.withType(JavaCompile) {
