@@ -15,6 +15,8 @@ import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.PageReader;
 import org.embulk.spi.Schema;
+import org.embulk.util.config.ConfigMapper;
+import org.embulk.util.config.TaskMapper;
 import org.junit.Test;
 
 public class TestSpeedometerFilterPlugin
@@ -40,17 +42,23 @@ public class TestSpeedometerFilterPlugin
     @Mocked
     FilterPlugin.Control control;
 
+    @Mocked
+    ConfigMapper configMapper;
+
+    @Mocked
+    TaskMapper taskMapper;
+
     @Test
     public void testTransaction() {
         new Expectations() {{
-            config.loadConfig(PluginTask.class); result = task; minTimes = 0;
+            configMapper.map(config, PluginTask.class); result = task; minTimes = 0;
         }};
 
         SpeedometerFilterPlugin plugin = new SpeedometerFilterPlugin();
         plugin.transaction(config, schema, control);
 
         new Verifications() {{
-            config.loadConfig(PluginTask.class); times = 1;
+            configMapper.map(config, PluginTask.class); times = 1;
             control.run((TaskSource)any, schema); times = 1;
         }};
     }
@@ -58,7 +66,7 @@ public class TestSpeedometerFilterPlugin
     @Test
     public void testOpen(final @Mocked PageReader reader, final @Mocked PageBuilder builder, final @Mocked Page page) throws Exception {
         new Expectations() {{
-            taskSource.loadTask(PluginTask.class); result = task; minTimes = 0;
+            taskMapper.map(taskSource, PluginTask.class); result = task; minTimes = 0;
             task.getDelimiter(); result = ""; minTimes = 0;
             reader.nextRecord(); result = true; result = false; minTimes = 0;
         }};
@@ -68,7 +76,7 @@ public class TestSpeedometerFilterPlugin
         output.add(page);
 
         new Verifications() {{
-            taskSource.loadTask(PluginTask.class); times = 1;
+            taskMapper.map(taskSource, PluginTask.class); times = 1;
             builder.addRecord(); times = 1;
             builder.finish(); times = 0;
             reader.nextRecord(); times = 2;
@@ -80,7 +88,7 @@ public class TestSpeedometerFilterPlugin
     @Test
     public void testFinish(final @Mocked PageReader reader, final @Mocked PageBuilder builder, final @Mocked Page page) throws Exception {
         new Expectations() {{
-            taskSource.loadTask(PluginTask.class); result = task; minTimes = 0;
+            taskMapper.map(taskSource, PluginTask.class); result = task; minTimes = 0;
             task.getDelimiter(); result = ""; minTimes = 0;
         }};
 
@@ -89,7 +97,7 @@ public class TestSpeedometerFilterPlugin
         output.finish();
 
         new Verifications() {{
-            taskSource.loadTask(PluginTask.class); times = 1;
+            taskMapper.map(taskSource, PluginTask.class); times = 1;
             builder.finish(); times = 1;
         }};
     }
@@ -97,7 +105,7 @@ public class TestSpeedometerFilterPlugin
     @Test
     public void testClose(final @Mocked PageReader reader, final @Mocked PageBuilder builder, final @Mocked Page page) throws Exception {
         new Expectations() {{
-            taskSource.loadTask(PluginTask.class); result = task; minTimes = 0;
+            taskMapper.map(taskSource, PluginTask.class); result = task; minTimes = 0;
             task.getDelimiter(); result = ""; minTimes = 0;
         }};
 
@@ -106,7 +114,7 @@ public class TestSpeedometerFilterPlugin
         output.close();
 
         new Verifications() {{
-            taskSource.loadTask(PluginTask.class); times = 1;
+            taskMapper.map(taskSource, PluginTask.class); times = 1;
             builder.close(); times = 1;
         }};
     }

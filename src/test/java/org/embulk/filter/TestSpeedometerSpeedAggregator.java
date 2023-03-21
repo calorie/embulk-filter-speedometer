@@ -6,9 +6,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.embulk.filter.SpeedometerFilterPlugin.PluginTask;
-import org.embulk.spi.Exec;
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import mockit.Expectations;
 import mockit.Mocked;
@@ -16,7 +16,7 @@ import mockit.Verifications;
 
 public class TestSpeedometerSpeedAggregator {
     @Mocked SpeedometerSpeedController controller;
-    @Mocked Exec exec;
+    @Mocked LoggerFactory loggerFactory;
     @Mocked PluginTask task;
 
     @Test
@@ -70,7 +70,7 @@ public class TestSpeedometerSpeedAggregator {
     @Test
     public void testStopControllerShowOverallMessage(@Mocked final Logger logger) {
         new Expectations() {{
-            Exec.getLogger(SpeedometerFilterPlugin.class); result = logger; minTimes = 0;
+            LoggerFactory.getLogger(SpeedometerFilterPlugin.class); result = logger; minTimes = 0;
         }};
 
         SpeedometerSpeedAggregator aggregator = new SpeedometerSpeedAggregator();

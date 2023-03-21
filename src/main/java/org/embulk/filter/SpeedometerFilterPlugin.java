@@ -18,22 +18,28 @@ import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.PageReader;
 import org.embulk.spi.Schema;
+import org.embulk.spi.json.JsonValue;
 import org.embulk.spi.type.TimestampType;
 import org.embulk.util.config.Config;
 import org.embulk.util.config.ConfigDefault;
+import org.embulk.util.config.ConfigMapper;
 import org.embulk.util.config.ConfigMapperFactory;
+import org.embulk.util.config.TaskMapper;
 import org.embulk.util.config.Task;
 import org.embulk.util.config.units.ColumnConfig;
 import org.embulk.util.config.units.SchemaConfig;
 import org.embulk.util.timestamp.TimestampFormatter;
-import org.msgpack.value.Value;
 
 public class SpeedometerFilterPlugin
         implements FilterPlugin
 {
     private static final int TRUE_LENGTH = Boolean.toString(true).length();
     private static final int FALSE_LENGTH = Boolean.toString(false).length();
+
     private static final ConfigMapperFactory CONFIG_MAPPER_FACTORY = ConfigMapperFactory.builder().addDefaultModules().build();
+    private static final ConfigMapper CONFIG_MAPPER = CONFIG_MAPPER_FACTORY.createConfigMapper();
+    private static final TaskMapper TASK_MAPPER = CONFIG_MAPPER_FACTORY.createTaskMapper();
+
 
     public interface PluginTask extends Task
     {
@@ -102,16 +108,16 @@ public class SpeedometerFilterPlugin
     public void transaction(ConfigSource config, Schema inputSchema,
             FilterPlugin.Control control)
     {
-        PluginTask task = config.loadConfig(PluginTask.class);
+        final PluginTask task = CONFIG_MAPPER.map(config, PluginTask.class);
         Schema outputSchema = inputSchema;
-        control.run(task.dump(), outputSchema);
+        control.run(task.toTaskSource(), outputSchema);
     }
 
     @Override
     public PageOutput open(TaskSource taskSource, Schema inputSchema,
             Schema outputSchema, PageOutput output)
     {
-        PluginTask task = taskSource.loadTask(PluginTask.class);
+        final PluginTask task = TASK_MAPPER.map(taskSource, PluginTask.class);
 
         return new SpeedControlPageOutput(task, inputSchema, output);
     }
@@ -251,7 +257,7 @@ public class SpeedometerFilterPlugin
                     speedMonitor(column);
                     pageBuilder.setNull(column);
                 } else {
-                    pageBuilder.setJson(column, speedMonitor(column, pageReader.getJson(column)));
+                    pageBuilder.setJson(column, speedMonitor(column, pageReader.getJsonValue(column)));
                 }
             }
 
@@ -299,7 +305,7 @@ public class SpeedometerFilterPlugin
                 return t;
             }
 
-            private Value speedMonitor(Column column, Value v) {
+            private JsonValue speedMonitor(Column column, JsonValue v) {
                 speedMonitorForDelimiter(column);
                 // NOTE: This may not be good for performance. But, I have no other idea.
                 String s = v.toJson();
