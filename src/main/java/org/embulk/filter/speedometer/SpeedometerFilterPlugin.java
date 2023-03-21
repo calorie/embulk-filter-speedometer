@@ -1,4 +1,4 @@
-package org.embulk.filter;
+package org.embulk.filter.speedometer;
 
 import java.time.Instant;
 import java.util.Map;
