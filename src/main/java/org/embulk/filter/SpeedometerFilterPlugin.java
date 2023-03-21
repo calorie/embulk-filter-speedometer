@@ -1,40 +1,45 @@
 package org.embulk.filter;
 
+import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.validation.constraints.Min;
 
-import org.embulk.config.Config;
-import org.embulk.config.ConfigDefault;
-import org.embulk.config.ConfigInject;
 import org.embulk.config.ConfigSource;
-import org.embulk.config.Task;
 import org.embulk.config.TaskSource;
 import org.embulk.spi.BufferAllocator;
 import org.embulk.spi.Column;
 import org.embulk.spi.ColumnVisitor;
+import org.embulk.spi.Exec;
 import org.embulk.spi.FilterPlugin;
 import org.embulk.spi.Page;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.PageReader;
 import org.embulk.spi.Schema;
-import org.embulk.spi.time.Timestamp;
-import org.embulk.spi.time.TimestampFormatter;
-import org.embulk.spi.util.Timestamps;
+import org.embulk.spi.type.TimestampType;
+import org.embulk.util.config.Config;
+import org.embulk.util.config.ConfigDefault;
+import org.embulk.util.config.ConfigMapperFactory;
+import org.embulk.util.config.Task;
+import org.embulk.util.config.units.ColumnConfig;
+import org.embulk.util.config.units.SchemaConfig;
+import org.embulk.util.timestamp.TimestampFormatter;
 import org.msgpack.value.Value;
-
-import com.google.common.base.Optional;
 
 public class SpeedometerFilterPlugin
         implements FilterPlugin
 {
     private static final int TRUE_LENGTH = Boolean.toString(true).length();
     private static final int FALSE_LENGTH = Boolean.toString(false).length();
+    private static final ConfigMapperFactory CONFIG_MAPPER_FACTORY = ConfigMapperFactory.builder().addDefaultModules().build();
 
-    public interface PluginTask
-            extends Task,  TimestampFormatter.Task
+    public interface PluginTask extends Task
     {
+        @Config("columns")
+        SchemaConfig getSchemaConfig();
+
         @Config("speed_limit")
         @ConfigDefault("0")
         @Min(0)
@@ -66,13 +71,32 @@ public class SpeedometerFilterPlugin
         @ConfigDefault("null")
         public Optional<String> getLabel();
 
-        @ConfigInject
-        public BufferAllocator getBufferAllocator();
+        @Config("default_timezone")
+        @ConfigDefault("\"UTC\"")
+        String getDefaultTimeZoneId();
+
+        @Config("default_timestamp_format")
+        @ConfigDefault("\"%Y-%m-%d %H:%M:%S.%N %z\"")
+        String getDefaultTimestampFormat();
+
+        @Config("default_date")
+        @ConfigDefault("\"1970-01-01\"")
+        String getDefaultDate();
     }
 
-    public interface TimestampColumnOption extends Task,
-    TimestampFormatter.TimestampColumnOption
-    { }
+    public interface TimestampColumnOption extends Task {
+        @Config("timezone")
+        @ConfigDefault("null")
+        Optional<String> getTimeZoneId();
+
+        @Config("format")
+        @ConfigDefault("null")
+        Optional<String> getFormat();
+
+        @Config("date")
+        @ConfigDefault("null")
+        Optional<String> getDate();
+    }
 
     @Override
     public void transaction(ConfigSource config, Schema inputSchema,
@@ -105,11 +129,11 @@ public class SpeedometerFilterPlugin
         SpeedControlPageOutput(PluginTask task, Schema schema, PageOutput pageOutput) {
             this.controller = new SpeedometerSpeedController(task, SpeedometerSpeedAggregator.getInstance(task));
             this.schema = schema;
-            this.allocator = task.getBufferAllocator();
+            this.allocator = Exec.getBufferAllocator();
             this.delimiterLength = task.getDelimiter().length();
             this.recordPaddingSize = task.getRecordPaddingSize();
             this.pageReader = new PageReader(schema);
-            this.timestampFormatters = Timestamps.newTimestampColumnFormatters(task, schema, task.getColumnOptions());
+            this.timestampFormatters = newTimestampColumnFormatters(task, task.getSchemaConfig());
             this.pageBuilder = new PageBuilder(allocator, schema, pageOutput);
             this.controller.start(System.currentTimeMillis());
         }
@@ -135,6 +159,27 @@ public class SpeedometerFilterPlugin
         @Override
         public void close() {
             pageBuilder.close();
+        }
+
+        private static TimestampFormatter[] newTimestampColumnFormatters(
+                final PluginTask task,
+                final SchemaConfig schema) {
+            final TimestampFormatter[] formatters = new TimestampFormatter[schema.getColumnCount()];
+            int i = 0;
+            for (final ColumnConfig column : schema.getColumns()) {
+                if (column.getType() instanceof TimestampType) {
+                    final TimestampColumnOption columnOption =
+                            CONFIG_MAPPER_FACTORY.createConfigMapper().map(column.getOption(), TimestampColumnOption.class);
+
+                    final String pattern = columnOption.getFormat().orElse(task.getDefaultTimestampFormat());
+                    formatters[i] = TimestampFormatter.builder(pattern, true)
+                            .setDefaultZoneFromString(columnOption.getTimeZoneId().orElse(task.getDefaultTimeZoneId()))
+                            .setDefaultDateFromString(columnOption.getDate().orElse(task.getDefaultDate()))
+                            .build();
+                }
+                i++;
+            }
+            return formatters;
         }
 
         class ColumnVisitorImpl implements ColumnVisitor {
@@ -186,12 +231,17 @@ public class SpeedometerFilterPlugin
             }
 
             @Override
+            @SuppressWarnings("deprecation")
             public void timestampColumn(Column column) {
                 if (pageReader.isNull(column)) {
                     speedMonitor(column);
                     pageBuilder.setNull(column);
                 } else {
-                    pageBuilder.setTimestamp(column, speedMonitor(column, pageReader.getTimestamp(column)));
+                    try {
+                        pageBuilder.setTimestamp(column, speedMonitor(column, pageReader.getTimestampInstant(column)));
+                    } catch (final NoSuchMethodError ex) {
+                        pageBuilder.setTimestamp(column, speedMonitor(column, pageReader.getTimestamp(column).getInstant()));
+                    }
                 }
             }
 
@@ -242,7 +292,7 @@ public class SpeedometerFilterPlugin
                 return s;
             }
 
-            private Timestamp speedMonitor(Column column, Timestamp t) {
+            private Instant speedMonitor(Column column, Instant t) {
                 speedMonitorForDelimiter(column);
                 TimestampFormatter formatter = timestampFormatters[column.getIndex()];
                 controller.checkSpeedLimit(startRecordTime, formatter.format(t).length());
