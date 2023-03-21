@@ -1,4 +1,4 @@
-package org.embulk.filter;
+package org.embulk.filter.speedometer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -6,7 +6,7 @@ import mockit.Expectations;
 import mockit.Mocked;
 import mockit.Verifications;
 
-import org.embulk.filter.SpeedometerFilterPlugin.PluginTask;
+import org.embulk.filter.speedometer.SpeedometerFilterPlugin.PluginTask;
 import org.junit.Test;
 
 public class TestSpeedometerSpeedController {

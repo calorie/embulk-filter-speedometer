@@ -1,11 +1,11 @@
-package org.embulk.filter;
+package org.embulk.filter.speedometer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.embulk.filter.SpeedometerFilterPlugin.PluginTask;
+import org.embulk.filter.speedometer.SpeedometerFilterPlugin.PluginTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

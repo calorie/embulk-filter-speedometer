@@ -1,4 +1,4 @@
-package org.embulk.filter;
+package org.embulk.filter.speedometer;
 
 import mockit.Expectations;
 import mockit.Mocked;
@@ -6,7 +6,7 @@ import mockit.Verifications;
 
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskSource;
-import org.embulk.filter.SpeedometerFilterPlugin.PluginTask;
+import org.embulk.filter.speedometer.SpeedometerFilterPlugin.PluginTask;
 import org.embulk.spi.ColumnVisitor;
 import org.embulk.spi.Exec;
 import org.embulk.spi.FilterPlugin;

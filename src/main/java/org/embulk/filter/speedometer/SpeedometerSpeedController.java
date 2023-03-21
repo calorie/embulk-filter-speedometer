@@ -1,6 +1,6 @@
-package org.embulk.filter;
+package org.embulk.filter.speedometer;
 
-import org.embulk.filter.SpeedometerFilterPlugin.PluginTask;
+import org.embulk.filter.speedometer.SpeedometerFilterPlugin.PluginTask;
 
 
 class SpeedometerSpeedController {
