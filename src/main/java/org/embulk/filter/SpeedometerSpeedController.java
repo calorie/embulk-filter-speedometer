@@ -52,7 +52,7 @@ class SpeedometerSpeedController {
     public long getTotalBytes() {
         return threadTotalBytes + periodTotalBytes;
     }
-    
+
     public long getTotalRecords() {
         return threadTotalRecords + periodTotalRecords;
     }
@@ -101,7 +101,6 @@ class SpeedometerSpeedController {
                 sleepTime = sleepTime > maxSleepMillisec ? maxSleepMillisec : sleepTime > 0 ? sleepTime : 0;
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
-                // TODO: Do I need to throw an exception ?
             }
         }
     }
