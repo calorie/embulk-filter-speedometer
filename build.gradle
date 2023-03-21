@@ -55,9 +55,13 @@ dependencies {
 
     implementation "com.google.guava:guava:31.1-jre"
     implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'org.slf4j:slf4j-simple:2.0.7'
 
     testImplementation "junit:junit:4.13.2"
     testImplementation "org.jmockit:jmockit:1.49"
+    testImplementation "org.embulk:embulk-core:0.10.43"
+    testImplementation "org.embulk:embulk-deps:0.10.43"
+    testImplementation "org.embulk:embulk-junit4:0.10.43"
 }
 
 embulkPlugin {
@@ -103,4 +107,10 @@ gem {
 
 gemPush {
     host = "https://rubygems.org"
+}
+
+test {
+    doFirst {
+        jvmArgs "-javaagent:${classpath.find { it.name.contains("jmockit") }}"
+    }
 }

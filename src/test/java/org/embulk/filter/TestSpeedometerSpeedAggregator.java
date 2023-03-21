@@ -10,8 +10,8 @@ import org.embulk.spi.Exec;
 import org.junit.Test;
 import org.slf4j.Logger;
 
+import mockit.Expectations;
 import mockit.Mocked;
-import mockit.NonStrictExpectations;
 import mockit.Verifications;
 
 public class TestSpeedometerSpeedAggregator {
@@ -52,9 +52,9 @@ public class TestSpeedometerSpeedAggregator {
 
     @Test
     public void testStopController() {
-        new NonStrictExpectations() {{
-            controller.getTotalBytes(); result = 11;
-            controller.getTotalRecords(); result = 5;
+        new Expectations() {{
+            controller.getTotalBytes(); result = 11; minTimes = 0;
+            controller.getTotalRecords(); result = 5; minTimes = 0;
         }};
 
         SpeedometerSpeedAggregator aggregator = new SpeedometerSpeedAggregator();
@@ -69,8 +69,8 @@ public class TestSpeedometerSpeedAggregator {
 
     @Test
     public void testStopControllerShowOverallMessage(@Mocked final Logger logger) {
-        new NonStrictExpectations() {{
-            Exec.getLogger(SpeedometerFilterPlugin.class); result = logger;
+        new Expectations() {{
+            Exec.getLogger(SpeedometerFilterPlugin.class); result = logger; minTimes = 0;
         }};
 
         SpeedometerSpeedAggregator aggregator = new SpeedometerSpeedAggregator();
@@ -87,8 +87,8 @@ public class TestSpeedometerSpeedAggregator {
 
     @Test
     public void testGetSpeedLimitForController() {
-        new NonStrictExpectations() {{
-            controller.getSpeedLimit(); result = 10;
+        new Expectations() {{
+            controller.getSpeedLimit(); result = 10; minTimes = 0;
         }};
 
         SpeedometerSpeedAggregator aggregator = new SpeedometerSpeedAggregator();
