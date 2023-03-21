@@ -1,0 +1,7 @@
+version: '3.9'
+services:
+  java:
+    image: eclipse-temurin:8
+    volumes:
+      - .:/embulk
+    working_dir: /embulk
