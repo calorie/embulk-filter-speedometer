@@ -1,7 +1,7 @@
 package org.embulk.filter;
 
+import mockit.Expectations;
 import mockit.Mocked;
-import mockit.NonStrictExpectations;
 import mockit.Verifications;
 
 import org.embulk.config.ConfigSource;
@@ -42,8 +42,8 @@ public class TestSpeedometerFilterPlugin
 
     @Test
     public void testTransaction() {
-        new NonStrictExpectations() {{
-            config.loadConfig(PluginTask.class); result = task;
+        new Expectations() {{
+            config.loadConfig(PluginTask.class); result = task; minTimes = 0;
         }};
 
         SpeedometerFilterPlugin plugin = new SpeedometerFilterPlugin();
@@ -57,10 +57,10 @@ public class TestSpeedometerFilterPlugin
 
     @Test
     public void testOpen(final @Mocked PageReader reader, final @Mocked PageBuilder builder, final @Mocked Page page) throws Exception {
-        new NonStrictExpectations() {{
-            taskSource.loadTask(PluginTask.class); result = task;
-            task.getDelimiter(); result = "";
-            reader.nextRecord(); result = true; result = false;
+        new Expectations() {{
+            taskSource.loadTask(PluginTask.class); result = task; minTimes = 0;
+            task.getDelimiter(); result = ""; minTimes = 0;
+            reader.nextRecord(); result = true; result = false; minTimes = 0;
         }};
 
         SpeedometerFilterPlugin plugin = new SpeedometerFilterPlugin();
@@ -79,9 +79,9 @@ public class TestSpeedometerFilterPlugin
 
     @Test
     public void testFinish(final @Mocked PageReader reader, final @Mocked PageBuilder builder, final @Mocked Page page) throws Exception {
-        new NonStrictExpectations() {{
-            taskSource.loadTask(PluginTask.class); result = task;
-            task.getDelimiter(); result = "";
+        new Expectations() {{
+            taskSource.loadTask(PluginTask.class); result = task; minTimes = 0;
+            task.getDelimiter(); result = ""; minTimes = 0;
         }};
 
         SpeedometerFilterPlugin plugin = new SpeedometerFilterPlugin();
@@ -96,9 +96,9 @@ public class TestSpeedometerFilterPlugin
 
     @Test
     public void testClose(final @Mocked PageReader reader, final @Mocked PageBuilder builder, final @Mocked Page page) throws Exception {
-        new NonStrictExpectations() {{
-            taskSource.loadTask(PluginTask.class); result = task;
-            task.getDelimiter(); result = "";
+        new Expectations() {{
+            taskSource.loadTask(PluginTask.class); result = task; minTimes = 0;
+            task.getDelimiter(); result = ""; minTimes = 0;
         }};
 
         SpeedometerFilterPlugin plugin = new SpeedometerFilterPlugin();

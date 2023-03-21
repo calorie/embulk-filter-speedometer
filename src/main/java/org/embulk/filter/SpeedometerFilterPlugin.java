@@ -132,9 +132,9 @@ public class SpeedometerFilterPlugin
             this.allocator = Exec.getBufferAllocator();
             this.delimiterLength = task.getDelimiter().length();
             this.recordPaddingSize = task.getRecordPaddingSize();
-            this.pageReader = new PageReader(schema);
+            this.pageReader = Exec.getPageReader(schema);
             this.timestampFormatters = newTimestampColumnFormatters(task, task.getSchemaConfig());
-            this.pageBuilder = new PageBuilder(allocator, schema, pageOutput);
+            this.pageBuilder = Exec.getPageBuilder(allocator, schema, pageOutput);
             this.controller.start(System.currentTimeMillis());
         }
 

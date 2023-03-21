@@ -2,8 +2,8 @@ package org.embulk.filter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import mockit.Expectations;
 import mockit.Mocked;
-import mockit.NonStrictExpectations;
 import mockit.Verifications;
 
 import org.embulk.filter.SpeedometerFilterPlugin.PluginTask;
@@ -20,10 +20,10 @@ public class TestSpeedometerSpeedController {
 
     @Test
     public void testSpeedometerSpeedController() {
-        new NonStrictExpectations() {{
-            task.getSpeedLimit(); result = 1L;
-            task.getMaxSleepMillisec(); result = 2;
-            task.getLogIntervalSeconds(); result = 3;
+        new Expectations() {{
+            task.getSpeedLimit(); result = 1L; minTimes = 0;
+            task.getMaxSleepMillisec(); result = 2; minTimes = 0;
+            task.getLogIntervalSeconds(); result = 3; minTimes = 0;
         }};
 
         controller = new SpeedometerSpeedController(task, aggregator);
@@ -51,11 +51,11 @@ public class TestSpeedometerSpeedController {
 
     @Test
     public void testGetTotalBytes() {
-        new NonStrictExpectations() {{
-            task.getSpeedLimit(); result = 1L;
-            task.getMaxSleepMillisec(); result = 2;
-            task.getLogIntervalSeconds(); result = 3;
-            aggregator.getSpeedLimitForController((SpeedometerSpeedController)any); result = 10000;
+        new Expectations() {{
+            task.getSpeedLimit(); result = 1L; minTimes = 0;
+            task.getMaxSleepMillisec(); result = 2; minTimes = 0;
+            task.getLogIntervalSeconds(); result = 3; minTimes = 0;
+            aggregator.getSpeedLimitForController((SpeedometerSpeedController)any); result = 10000; minTimes = 0;
         }};
         long nowTime = System.currentTimeMillis();
         int newDataSize = 3;
@@ -69,11 +69,11 @@ public class TestSpeedometerSpeedController {
 
     @Test
     public void testGetPeriodBytesPerSec() {
-        new NonStrictExpectations() {{
-            task.getSpeedLimit(); result = 1L;
-            task.getMaxSleepMillisec(); result = 2;
-            task.getLogIntervalSeconds(); result = 3;
-            aggregator.getSpeedLimitForController((SpeedometerSpeedController)any); result = 10000;
+        new Expectations() {{
+            task.getSpeedLimit(); result = 1L; minTimes = 0;
+            task.getMaxSleepMillisec(); result = 2; minTimes = 0;
+            task.getLogIntervalSeconds(); result = 3; minTimes = 0;
+            aggregator.getSpeedLimitForController((SpeedometerSpeedController)any); result = 10000; minTimes = 0;
         }};
         long nowTime = System.currentTimeMillis();
         int newDataSize = 3;
@@ -85,11 +85,11 @@ public class TestSpeedometerSpeedController {
 
     @Test
     public void testCheckSpeedLimit() {
-        new NonStrictExpectations() {{
-            task.getSpeedLimit(); result = 1L;
-            task.getMaxSleepMillisec(); result = 2;
-            task.getLogIntervalSeconds(); result = 3;
-            aggregator.getSpeedLimitForController((SpeedometerSpeedController)any); result = 10000;
+        new Expectations() {{
+            task.getSpeedLimit(); result = 1L; minTimes = 0;
+            task.getMaxSleepMillisec(); result = 2; minTimes = 0;
+            task.getLogIntervalSeconds(); result = 3; minTimes = 0;
+            aggregator.getSpeedLimitForController((SpeedometerSpeedController)any); result = 10000; minTimes = 0;
         }};
         long nowTime = System.currentTimeMillis();
         int newDataSize = 3;
@@ -113,11 +113,11 @@ public class TestSpeedometerSpeedController {
 
     @Test
     public void testGetTotalRecords() {
-        new NonStrictExpectations() {{
-            task.getSpeedLimit(); result = 1L;
-            task.getMaxSleepMillisec(); result = 2;
-            task.getLogIntervalSeconds(); result = 3;
-            aggregator.getSpeedLimitForController((SpeedometerSpeedController)any); result = 10000;
+        new Expectations() {{
+            task.getSpeedLimit(); result = 1L; minTimes = 0;
+            task.getMaxSleepMillisec(); result = 2; minTimes = 0;
+            task.getLogIntervalSeconds(); result = 3; minTimes = 0;
+            aggregator.getSpeedLimitForController((SpeedometerSpeedController)any); result = 10000; minTimes = 0;
         }};
         long nowTime = System.currentTimeMillis();
         int newDataSize = 3;
@@ -132,11 +132,11 @@ public class TestSpeedometerSpeedController {
 
     @Test
     public void testGetPeriodRecordsPerSec() {
-        new NonStrictExpectations() {{
-            task.getSpeedLimit(); result = 1L;
-            task.getMaxSleepMillisec(); result = 2;
-            task.getLogIntervalSeconds(); result = 3;
-            aggregator.getSpeedLimitForController((SpeedometerSpeedController)any); result = 10000;
+        new Expectations() {{
+            task.getSpeedLimit(); result = 1L; minTimes = 0;
+            task.getMaxSleepMillisec(); result = 2; minTimes = 0;
+            task.getLogIntervalSeconds(); result = 3; minTimes = 0;
+            aggregator.getSpeedLimitForController((SpeedometerSpeedController)any); result = 10000; minTimes = 0;
         }};
         long nowTime = System.currentTimeMillis();
         int newDataSize = 3;
